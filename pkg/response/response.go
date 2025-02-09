@@ -1,25 +1,24 @@
 package response
 
 import (
-	"encoding/json"
 	"errors"
 	"log/slog"
 	"net/http"
 	"strings"
+
+	"github.com/gin-gonic/gin"
 )
 
-type jsonResponse struct{}
+type JsonResponse struct{}
 
-func NewJSONResponse() jsonResponse {
-	return jsonResponse{}
+func NewJSONResponse() JsonResponse {
+	return JsonResponse{}
 }
-func (j jsonResponse) Response(w http.ResponseWriter, status int, responseCode string, data map[string]any) {
+func (j JsonResponse) Response(c *gin.Context, status int, responseCode string, data map[string]any) {
 	data["code"] = responseCode
 	data["status"] = status
 
-	w.Header().Add("Content-Type", "application/json")
-
-	json.NewEncoder(w).Encode(data)
+	c.JSON(status, data)
 
 	slog.Info("request info",
 		slog.Int("status", status),
@@ -28,7 +27,7 @@ func (j jsonResponse) Response(w http.ResponseWriter, status int, responseCode s
 	)
 }
 
-func (j jsonResponse) ErrorResponse(w http.ResponseWriter, status int, responseCode string, data map[string]any, errs ...error) {
+func (j JsonResponse) ErrorResponse(c *gin.Context, status int, responseCode string, data map[string]any, errs ...error) {
 	if errs == nil {
 		slog.Error("errs is required in ErrorResponse")
 	}
@@ -49,24 +48,24 @@ func (j jsonResponse) ErrorResponse(w http.ResponseWriter, status int, responseC
 	}
 
 	data["errors"] = any(temp)
-	j.Response(w, status, responseCode, data)
+	j.Response(c, status, responseCode, data)
 }
 
-func (j jsonResponse) ServerErrorResponse(w http.ResponseWriter, err error) {
+func (j JsonResponse) ServerErrorResponse(c *gin.Context, err error) {
 	slog.Error("SERVER ERROR", "error", err.Error())
-	j.Response(w, http.StatusInternalServerError, "", map[string]any{"msg": "Internal server error"})
+	j.Response(c, http.StatusInternalServerError, "", map[string]any{"msg": "Internal server error"})
 }
 
-func (j jsonResponse) ServerOrUserErrorResponse(w http.ResponseWriter, serverErr error, userErrs []error, responseCode string) {
+func (j JsonResponse) ServerOrUserErrorResponse(c *gin.Context, serverErr error, userErrs []error, responseCode string) {
 	if serverErr != nil {
-		j.ServerErrorResponse(w, serverErr)
+		j.ServerErrorResponse(c, serverErr)
 	} else if userErrs != nil {
-		j.ErrorResponse(w, http.StatusBadRequest, responseCode, nil, userErrs...)
+		j.ErrorResponse(c, http.StatusBadRequest, responseCode, nil, userErrs...)
 	} else {
 		panic("func ServerOrUserErrorResponse: serverErr and userErrs are nil")
 	}
 }
 
-func (j jsonResponse) InvalidJSONErrorResponse(w http.ResponseWriter, err error) {
-	j.ErrorResponse(w, http.StatusBadRequest, "invalid_json", nil, errors.New("invalid json"))
+func (j JsonResponse) InvalidJSONErrorResponse(c *gin.Context, err error) {
+	j.ErrorResponse(c, http.StatusBadRequest, "invalid_json", nil, errors.New("invalid json"))
 }
