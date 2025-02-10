@@ -18,9 +18,10 @@ type userHandler struct {
 	response response.JsonResponse
 }
 
-func NewUserHandler(service services.UserService) UserHandler {
+func NewUserHandler(service services.UserService, response response.JsonResponse) UserHandler {
 	return &userHandler{
-		service: service,
+		service:  service,
+		response: response,
 	}
 }
 
