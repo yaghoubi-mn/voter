@@ -152,7 +152,12 @@ func (s *postService) GetAll(sortBy enums.SortBy, page int) (responseDTO dtos.Re
 		return
 	}
 
-	responseDTO.Data["data"] = posts
+	postsOutput := make([]dtos.PostOutput, len(posts))
+	for i, post := range posts {
+		postsOutput[i] = dtos.GetPostOutputFromPost(post)
+	}
+
+	responseDTO.Data["data"] = postsOutput
 	return
 }
 
