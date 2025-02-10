@@ -17,7 +17,7 @@ type Comment struct {
 	Post      Post
 }
 
-type CommentVotes struct {
+type CommentVote struct {
 	ID        uint64
 	CommentID uint64
 	Comment   Comment

@@ -14,3 +14,13 @@ type Post struct {
 	AuthorID uint64
 	Author   User
 }
+
+type PostVote struct {
+	ID uint64
+
+	PostID uint64
+	Post   Post
+
+	UserID uint64
+	User   User
+}
