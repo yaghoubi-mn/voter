@@ -5,4 +5,5 @@ type ResponseDTO struct {
 	ServerErr    error
 	Data         map[string]any
 	ResponseCode string
+	Status       int
 }

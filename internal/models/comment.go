@@ -12,16 +12,16 @@ type Comment struct {
 
 	CommentID uint64
 	AuthorID  uint64
-	Author    User
+	Author    User `gorm:"constraint:OnDelete:CASCADE;"`
 	PostID    uint64
-	Post      Post
+	Post      Post `gorm:"constraint:OnDelete:CASCADE;"`
 }
 
 type CommentVote struct {
 	ID        uint64
 	CommentID uint64
-	Comment   Comment
+	Comment   Comment `gorm:"constraint:OnDelete:CASCADE;"`
 
 	UserID uint64
-	User   User
+	User   User `gorm:"constraint:OnDelete:CASCADE;"`
 }

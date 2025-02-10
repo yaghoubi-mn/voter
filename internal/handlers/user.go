@@ -40,7 +40,7 @@ func (h *userHandler) Login(c *gin.Context) {
 
 	responseDTO := h.service.Login(loginInput)
 	if responseDTO.UserErrs != nil || responseDTO.ServerErr != nil {
-		h.response.ServerOrUserErrorResponse(c, responseDTO.ServerErr, responseDTO.UserErrs, responseDTO.ResponseCode)
+		h.response.ServerOrUserErrorResponse(c, responseDTO.Status, responseDTO.ServerErr, responseDTO.UserErrs, responseDTO.ResponseCode)
 		return
 	}
 

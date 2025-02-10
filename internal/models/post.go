@@ -12,15 +12,15 @@ type Post struct {
 	ModifiedAt time.Time `gorm:"autoUpdateTime"`
 
 	AuthorID uint64
-	Author   User
+	Author   User `gorm:"constraint:OnDelete:CASCADE;"`
 }
 
 type PostVote struct {
 	ID uint64
 
 	PostID uint64
-	Post   Post
+	Post   Post `gorm:"constraint:OnDelete:CASCADE;"`
 
 	UserID uint64
-	User   User
+	User   User `gorm:"constraint:OnDelete:CASCADE;"`
 }

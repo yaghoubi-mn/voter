@@ -1,6 +1,6 @@
 package dtos
 
 type LoginInput struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+	Username string `json:"username" validate:"required"`
+	Password string `json:"password" validate:"required"`
 }

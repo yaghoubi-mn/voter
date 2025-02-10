@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"log/slog"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/yaghoubi-mn/voter/internal/config"
@@ -21,9 +22,10 @@ type userService struct {
 	validate *validator.Validate
 }
 
-func NewUserService(userRepository repositories.UserRepository) UserService {
+func NewUserService(userRepository repositories.UserRepository, validate *validator.Validate) UserService {
 	return &userService{
-		repo: userRepository,
+		repo:     userRepository,
+		validate: validate,
 	}
 }
 
@@ -61,15 +63,18 @@ func (s *userService) Login(loginInput dtos.LoginInput) (responseDTO dtos.Respon
 	// check password
 	err = utils.CompareHashAndPassword(user.Password, loginInput.Password, user.Salt)
 	if err != nil {
-		responseDTO.UserErrs = []error{errors.New("invalid password or username")}
-		responseDTO.ResponseCode = "invalid_username_or_password"
+		slog.Error("err", "errr", err.Error())
+		responseDTO.UserErrs = []error{errors.New("wrong password")}
+		responseDTO.ResponseCode = "wrong_password"
 		return
 	}
 
 	// generate jwt
 	tokens, err := jwt.CreateRefreshAndAccessFromUserWithMap(config.JWTRefreshExpireTime, config.JWTAccessExpireTime, user.ID, user.Username)
-	responseDTO.UserErrs = []error{err}
 	responseDTO.Data["tokens"] = tokens
+	if err != nil {
+		responseDTO.UserErrs = []error{err}
+	}
 	return
 
 }

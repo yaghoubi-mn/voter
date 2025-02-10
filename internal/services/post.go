@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"time"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/yaghoubi-mn/voter/internal/custom_errors"
@@ -88,17 +89,20 @@ func (s *postService) Update(postInput dtos.PostInput, postId uint64, user model
 	if post.AuthorID != user.ID {
 		responseDTO.UserErrs = []error{errors.New("you havn't access to this post")}
 		responseDTO.ResponseCode = "access_denied"
+		responseDTO.Status = 403
 		return
 	}
 
 	// update post
 	post.Title = postInput.Title
 	post.Content = postInput.Content
+	post.ModifiedAt = time.Now()
 	err = s.repo.Update(post)
 	if err != nil {
 		if err == custom_errors.RecordNotFound {
 			responseDTO.UserErrs = []error{errors.New("post not found")}
 			responseDTO.ResponseCode = "not_found"
+			responseDTO.Status = 404
 			return
 		}
 		responseDTO.ServerErr = err
@@ -123,6 +127,7 @@ func (s *postService) Delete(postId uint64, user models.User) (responseDTO dtos.
 	if post.AuthorID != user.ID {
 		responseDTO.UserErrs = []error{errors.New("you havn't access to this post")}
 		responseDTO.ResponseCode = "access_denied"
+		responseDTO.Status = 403
 		return
 	}
 
@@ -132,6 +137,7 @@ func (s *postService) Delete(postId uint64, user models.User) (responseDTO dtos.
 		if err == custom_errors.RecordNotFound {
 			responseDTO.UserErrs = []error{errors.New("post not found")}
 			responseDTO.ResponseCode = "not_found"
+			responseDTO.Status = 404
 			return
 		}
 		responseDTO.ServerErr = err

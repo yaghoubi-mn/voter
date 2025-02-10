@@ -49,7 +49,7 @@ func (h *postHandler) Create(c *gin.Context) {
 	}
 	responseDTO := h.service.Create(postInput, user.(models.User))
 	if responseDTO.ServerErr != nil || responseDTO.UserErrs != nil {
-		h.response.ServerOrUserErrorResponse(c, responseDTO.ServerErr, responseDTO.UserErrs, responseDTO.ResponseCode)
+		h.response.ServerOrUserErrorResponse(c, responseDTO.Status, responseDTO.ServerErr, responseDTO.UserErrs, responseDTO.ResponseCode)
 		return
 	}
 
@@ -84,7 +84,7 @@ func (h *postHandler) Update(c *gin.Context) {
 
 	responseDTO := h.service.Update(postInput, uint64(postId), user.(models.User))
 	if responseDTO.ServerErr != nil || responseDTO.UserErrs != nil {
-		h.response.ServerOrUserErrorResponse(c, responseDTO.ServerErr, responseDTO.UserErrs, responseDTO.ResponseCode)
+		h.response.ServerOrUserErrorResponse(c, responseDTO.Status, responseDTO.ServerErr, responseDTO.UserErrs, responseDTO.ResponseCode)
 		return
 	}
 
@@ -113,7 +113,7 @@ func (h *postHandler) Delete(c *gin.Context) {
 
 	responseDTO := h.service.Delete(uint64(postId), user.(models.User))
 	if responseDTO.ServerErr != nil || responseDTO.UserErrs != nil {
-		h.response.ServerOrUserErrorResponse(c, responseDTO.ServerErr, responseDTO.UserErrs, responseDTO.ResponseCode)
+		h.response.ServerOrUserErrorResponse(c, responseDTO.Status, responseDTO.ServerErr, responseDTO.UserErrs, responseDTO.ResponseCode)
 		return
 	}
 
@@ -149,7 +149,7 @@ func (h *postHandler) GetAll(c *gin.Context) {
 	// call service
 	responseDTO := h.service.GetAll(orderBy, page)
 	if responseDTO.ServerErr != nil || responseDTO.UserErrs != nil {
-		h.response.ServerOrUserErrorResponse(c, responseDTO.ServerErr, responseDTO.UserErrs, responseDTO.ResponseCode)
+		h.response.ServerOrUserErrorResponse(c, responseDTO.Status, responseDTO.ServerErr, responseDTO.UserErrs, responseDTO.ResponseCode)
 		return
 	}
 
@@ -172,7 +172,7 @@ func (h *postHandler) GetByID(c *gin.Context) {
 
 	responseDTO := h.service.GetByID(uint64(postId))
 	if responseDTO.ServerErr != nil || responseDTO.UserErrs != nil {
-		h.response.ServerOrUserErrorResponse(c, responseDTO.ServerErr, responseDTO.UserErrs, responseDTO.ResponseCode)
+		h.response.ServerOrUserErrorResponse(c, responseDTO.Status, responseDTO.ServerErr, responseDTO.UserErrs, responseDTO.ResponseCode)
 		return
 	}
 

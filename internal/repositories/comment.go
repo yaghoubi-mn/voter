@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"github.com/yaghoubi-mn/voter/internal/config"
 	"github.com/yaghoubi-mn/voter/internal/custom_errors"
 	"github.com/yaghoubi-mn/voter/internal/enums"
 	"github.com/yaghoubi-mn/voter/internal/models"
@@ -12,7 +13,8 @@ type CommentRepository interface {
 	Update(comment models.Comment) error
 	Delete(commentId uint64) error
 	GetByID(commentId uint64) (models.Comment, error)
-	GetAll(sortBy enums.SortBy) ([]models.Comment, error)
+	GetAll(postId uint64, sortBy enums.SortBy, page int) ([]models.Comment, error)
+	GetAllReplies(commentId uint64) ([]models.Comment, error)
 }
 
 type commentRepository struct {
@@ -40,7 +42,7 @@ func (r *commentRepository) Delete(commentId uint64) error {
 
 func (r *commentRepository) GetByID(commentId uint64) (models.Comment, error) {
 	var comment models.Comment
-	if err := r.db.First(&comment, &models.Comment{ID: commentId}).Error; err != nil {
+	if err := r.db.Preload("Author").First(&comment, &models.Comment{ID: commentId}).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return comment, custom_errors.RecordNotFound
 		}
@@ -51,9 +53,19 @@ func (r *commentRepository) GetByID(commentId uint64) (models.Comment, error) {
 	return comment, nil
 }
 
-func (r *commentRepository) GetAll(sortBy enums.SortBy) ([]models.Comment, error) {
+func (r *commentRepository) GetAll(postId uint64, sortBy enums.SortBy, page int) ([]models.Comment, error) {
 	var comments []models.Comment
-	err := r.db.Order(sortBy).Find(&comments).Error
+	err := r.db.Preload("Author").Where("post_id=?", postId).Order(sortBy).Offset((page - 1) * config.PageLimit).Limit(config.PageLimit).Find(&comments).Error
 
 	return comments, err
+}
+
+func (r *commentRepository) GetAllReplies(commentId uint64) ([]models.Comment, error) {
+
+	var comments []models.Comment
+	if err := r.db.Where("comment_id=?", commentId).Find(&comments).Error; err != nil {
+		return nil, err
+	}
+
+	return comments, nil
 }
