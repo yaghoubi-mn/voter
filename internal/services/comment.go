@@ -1,10 +1,14 @@
 package services
 
 import (
+	"encoding/json"
 	"errors"
+	"log/slog"
+	"strings"
 	"time"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/yaghoubi-mn/voter/internal/cache"
 	"github.com/yaghoubi-mn/voter/internal/custom_errors"
 	"github.com/yaghoubi-mn/voter/internal/dtos"
 	"github.com/yaghoubi-mn/voter/internal/enums"
@@ -28,14 +32,16 @@ type commentService struct {
 	postRepo repositories.PostRepository
 	voteRepo repositories.CommentVoteRepository
 	validate *validator.Validate
+	cache    cache.Cache
 }
 
-func NewCommentService(repo repositories.CommentRepository, voteRepo repositories.CommentVoteRepository, postRepo repositories.PostRepository, validate *validator.Validate) CommentService {
+func NewCommentService(repo repositories.CommentRepository, voteRepo repositories.CommentVoteRepository, postRepo repositories.PostRepository, validate *validator.Validate, cache cache.Cache) CommentService {
 	return &commentService{
 		repo:     repo,
 		voteRepo: voteRepo,
 		postRepo: postRepo,
 		validate: validate,
+		cache:    cache,
 	}
 }
 
@@ -152,6 +158,12 @@ func (s *commentService) Update(commentInput dtos.CommentInput, commentId uint64
 		return
 	}
 
+	// clear cache
+	err = s.cache.FlushDB()
+	if err != nil {
+		slog.Error("error in flushing database", "error", err)
+	}
+
 	responseDTO.Data["msg"] = "Done"
 	return
 
@@ -214,6 +226,13 @@ func (s *commentService) Delete(commentId uint64, user models.User) (responseDTO
 		}
 
 	}
+
+	// clear cache
+	err = s.cache.FlushDB()
+	if err != nil {
+		slog.Error("error in flushing database", "error", err)
+	}
+
 	responseDTO.Data["msg"] = "Done"
 	return
 }
@@ -221,11 +240,33 @@ func (s *commentService) Delete(commentId uint64, user models.User) (responseDTO
 func (s *commentService) GetAll(postId uint64, sortBy enums.SortBy, page int) (responseDTO dtos.ResponseDTO) {
 	responseDTO.Data = make(map[string]any)
 
-	// get data from database
-	comments, err := s.repo.GetAll(postId, sortBy, page)
+	cacheName := "comment_page_" + string(sortBy)
+
+	var comments []models.Comment
+
+	// get data from cache
+	data, err := s.cache.Get(cacheName, postId)
 	if err != nil {
-		responseDTO.ServerErr = err
-		return
+
+		// get data from database
+		comments, err = s.repo.GetAll(postId, sortBy, page)
+		if err != nil {
+			responseDTO.ServerErr = err
+			return
+		}
+
+		// save data to cache
+		data, err := json.Marshal(comments)
+		if err != nil {
+			slog.Error("cannot marshal data", "error", err)
+		}
+		err = s.cache.Set(cacheName, postId, string(data))
+		if err != nil {
+			slog.Error("cannot cache data", "error", err)
+		}
+
+	} else {
+		json.NewDecoder(strings.NewReader(data)).Decode(&comments)
 	}
 
 	commentsOutput := make([]dtos.CommentOutput, len(comments))
@@ -240,12 +281,32 @@ func (s *commentService) GetAll(postId uint64, sortBy enums.SortBy, page int) (r
 func (s *commentService) GetByID(commentId uint64) (responseDTO dtos.ResponseDTO) {
 	responseDTO.Data = make(map[string]any)
 
-	comment, err := s.repo.GetByID(commentId)
-	if err != nil {
-		responseDTO.ServerErr = err
-		return
-	}
+	cacheName := "comment"
 
+	var comment models.Comment
+	// get data from cache
+	data, err := s.cache.Get(cacheName, commentId)
+	if err != nil {
+		// get data from database
+		comment, err = s.repo.GetByID(commentId)
+		if err != nil {
+			responseDTO.ServerErr = err
+			return
+		}
+
+		// save data to cache
+		data, err := json.Marshal(comment)
+		if err != nil {
+			slog.Error("cannot marshal data", "error", err)
+		}
+		err = s.cache.Set(cacheName, commentId, string(data))
+		if err != nil {
+			slog.Error("cannot cache data", "error", err)
+		}
+
+	} else {
+		json.NewDecoder(strings.NewReader(data)).Decode(&comment)
+	}
 	commentOutput := dtos.GetCommentOutputFromComment(comment)
 	responseDTO.Data["data"] = commentOutput
 	return
@@ -327,6 +388,12 @@ func (s *commentService) Vote(commentId uint64, vote bool, user models.User) (re
 		return
 	}
 
+	// clear cache
+	err = s.cache.FlushDB()
+	if err != nil {
+		slog.Error("error in flushing database", "error", err)
+	}
+
 	responseDTO.Data["msg"] = "Done"
 	return
 
@@ -358,6 +425,12 @@ func (s *commentService) DeleteVote(commentId uint64, user models.User) (respons
 	if err != nil {
 		responseDTO.ServerErr = err
 		return
+	}
+
+	// clear cache
+	err = s.cache.FlushDB()
+	if err != nil {
+		slog.Error("error in flushing database", "error", err)
 	}
 
 	responseDTO.Data["msg"] = "Done"

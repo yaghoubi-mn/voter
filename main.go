@@ -1,11 +1,13 @@
 package main
 
 import (
+	"context"
 	"log/slog"
 	"os"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/joho/godotenv"
+	"github.com/yaghoubi-mn/voter/internal/cache"
 	"github.com/yaghoubi-mn/voter/internal/database"
 	"github.com/yaghoubi-mn/voter/internal/handlers"
 	"github.com/yaghoubi-mn/voter/internal/middleware"
@@ -25,6 +27,13 @@ func main() {
 	godotenv.Load()
 
 	jwt.Init([]byte(os.Getenv("JWT_SECRET_KEY")))
+
+	redisClient, err := cache.Setup()
+	if err != nil {
+		slog.Error("cache connection error", "error", err)
+	}
+
+	redisCache := cache.NewCache(redisClient, context.Background())
 
 	db, err := database.Setup()
 	if err != nil {
@@ -56,8 +65,8 @@ func main() {
 
 	// services
 	userService := services.NewUserService(userRepository, validate)
-	postService := services.NewPostService(postRepository, postVoteRepository, validate)
-	commentService := services.NewCommentService(commentRepository, commentVoteRepository, postRepository, validate)
+	postService := services.NewPostService(postRepository, postVoteRepository, validate, redisCache)
+	commentService := services.NewCommentService(commentRepository, commentVoteRepository, postRepository, validate, redisCache)
 
 	// handlers
 	userHandler := handlers.NewUserHandler(userService, response)

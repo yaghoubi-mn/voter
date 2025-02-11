@@ -1,10 +1,14 @@
 package services
 
 import (
+	"encoding/json"
 	"errors"
+	"log/slog"
+	"strings"
 	"time"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/yaghoubi-mn/voter/internal/cache"
 	"github.com/yaghoubi-mn/voter/internal/custom_errors"
 	"github.com/yaghoubi-mn/voter/internal/dtos"
 	"github.com/yaghoubi-mn/voter/internal/enums"
@@ -26,13 +30,15 @@ type postService struct {
 	repo     repositories.PostRepository
 	voteRepo repositories.PostVoteRepository
 	validate *validator.Validate
+	cache    cache.Cache
 }
 
-func NewPostService(repo repositories.PostRepository, voteRepo repositories.PostVoteRepository, validate *validator.Validate) PostService {
+func NewPostService(repo repositories.PostRepository, voteRepo repositories.PostVoteRepository, validate *validator.Validate, cache cache.Cache) PostService {
 	return &postService{
 		repo:     repo,
 		voteRepo: voteRepo,
 		validate: validate,
+		cache:    cache,
 	}
 }
 
@@ -113,6 +119,12 @@ func (s *postService) Update(postInput dtos.PostInput, postId uint64, user model
 		return
 	}
 
+	// clear cache
+	err = s.cache.FlushDB()
+	if err != nil {
+		slog.Error("error in flushing database", "error", err)
+	}
+
 	responseDTO.Data["msg"] = "Done"
 	return
 
@@ -148,6 +160,12 @@ func (s *postService) Delete(postId uint64, user models.User) (responseDTO dtos.
 		return
 	}
 
+	// clear cache
+	err = s.cache.FlushDB()
+	if err != nil {
+		slog.Error("error in flushing database", "error", err)
+	}
+
 	responseDTO.Data["msg"] = "Done"
 	return
 }
@@ -155,11 +173,36 @@ func (s *postService) Delete(postId uint64, user models.User) (responseDTO dtos.
 func (s *postService) GetAll(sortBy enums.SortBy, page int) (responseDTO dtos.ResponseDTO) {
 	responseDTO.Data = make(map[string]any)
 
+	cacheName := "post_page_" + string(sortBy)
+
+	var posts []models.Post
 	// get data from database
-	posts, err := s.repo.GetAll(sortBy, page)
+	data, err := s.cache.Get(cacheName, uint64(page))
 	if err != nil {
-		responseDTO.ServerErr = err
-		return
+
+		// get data from database
+		posts, err = s.repo.GetAll(sortBy, page)
+		if err != nil {
+			responseDTO.ServerErr = err
+			return
+		}
+
+		// save posts to cache
+		data, err := json.Marshal(posts)
+		if err != nil {
+
+			slog.Error("cannot marshal data", "error", err)
+
+		} else {
+
+			err = s.cache.Set(cacheName, uint64(page), string(data))
+			if err != nil {
+				slog.Error("cannot cache data", "error", err)
+			}
+		}
+
+	} else {
+		json.NewDecoder(strings.NewReader(data)).Decode(&posts)
 	}
 
 	postsOutput := make([]dtos.PostOutput, len(posts))
@@ -174,10 +217,34 @@ func (s *postService) GetAll(sortBy enums.SortBy, page int) (responseDTO dtos.Re
 func (s *postService) GetByID(postId uint64) (responseDTO dtos.ResponseDTO) {
 	responseDTO.Data = make(map[string]any)
 
-	post, err := s.repo.GetByID(postId)
+	cacheName := "post"
+
+	var post models.Post
+
+	data, err := s.cache.Get(cacheName, postId)
 	if err != nil {
-		responseDTO.ServerErr = err
-		return
+
+		// get data from database
+		post, err = s.repo.GetByID(postId)
+		if err != nil {
+			responseDTO.ServerErr = err
+			return
+		}
+
+		data, err := json.Marshal(post)
+		if err != nil {
+			slog.Error("cannot marshal post", "error", err)
+		} else {
+
+			err = s.cache.Set(cacheName, postId, string(data))
+			if err != nil {
+				slog.Error("cannot cache data", "error", err)
+			}
+
+		}
+
+	} else {
+		json.NewDecoder(strings.NewReader(data)).Decode(&post)
 	}
 
 	postOutput := dtos.GetPostOutputFromPost(post)
@@ -261,6 +328,12 @@ func (s *postService) Vote(postId uint64, vote bool, user models.User) (response
 		return
 	}
 
+	// clear cache
+	err = s.cache.FlushDB()
+	if err != nil {
+		slog.Error("error in flushing database", "error", err)
+	}
+
 	responseDTO.Data["msg"] = "Done"
 	return
 
@@ -292,6 +365,12 @@ func (s *postService) DeleteVote(postId uint64, user models.User) (responseDTO d
 	if err != nil {
 		responseDTO.ServerErr = err
 		return
+	}
+
+	// clear cache
+	err = s.cache.FlushDB()
+	if err != nil {
+		slog.Error("error in flushing database", "error", err)
 	}
 
 	responseDTO.Data["msg"] = "Done"

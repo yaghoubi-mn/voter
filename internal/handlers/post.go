@@ -3,7 +3,6 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -144,12 +143,14 @@ func (h *postHandler) GetAll(c *gin.Context) {
 	if !ok {
 		sortBy = enums.DefaultSort
 	}
-	fmt.Println("-------", sortByString)
+
 	switch sortByString {
 	case "score":
 		sortBy = enums.SortByScore
 	case "date":
 		sortBy = enums.SortByDate
+	case "":
+		sortBy = enums.DefaultSort
 	default:
 		h.response.ErrorResponse(c, 400, "invalid_param", nil, errors.New("sort_by: invalid sort_by value"))
 		return

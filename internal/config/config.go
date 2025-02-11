@@ -9,4 +9,6 @@ const (
 	PageLimit = 20
 
 	TimeFormat = "2006-01-02 15:04"
+
+	RedisExpiration = 10 * time.Minute
 )
