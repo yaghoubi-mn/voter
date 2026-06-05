@@ -53,7 +53,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "authorization token (value: \\",
+                        "description": "authorization token (value: Bearer \u003cjwt-token\u003e)",
                         "name": "Authorization",
                         "in": "header",
                         "required": true
@@ -75,6 +75,9 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request"
                     },
+                    "403": {
+                        "description": "Forbidden"
+                    },
                     "500": {
                         "description": "Internal Server Error"
                     }
@@ -94,7 +97,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "authorization token (value: \\",
+                        "description": "authorization token (value: Bearer \u003cjwt-token\u003e)",
                         "name": "Authorization",
                         "in": "header",
                         "required": true
@@ -106,6 +109,9 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request"
+                    },
+                    "403": {
+                        "description": "Forbidden"
                     },
                     "500": {
                         "description": "Internal Server Error"
@@ -128,7 +134,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "authorization token (value: \\",
+                        "description": "authorization token (value: Bearer \u003cjwt-token\u003e)",
                         "name": "Authorization",
                         "in": "header",
                         "required": true
@@ -162,7 +168,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "authorization token (value: \\",
+                        "description": "authorization token (value: Bearer \u003cjwt-token\u003e)",
                         "name": "Authorization",
                         "in": "header",
                         "required": true
@@ -196,7 +202,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "authorization token (value: \\",
+                        "description": "authorization token (value: Bearer \u003cjwt-token\u003e)",
                         "name": "Authorization",
                         "in": "header",
                         "required": true
@@ -230,7 +236,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "authorization token (value: \\",
+                        "description": "authorization token (value: Bearer \u003cjwt-token\u003e)",
                         "name": "Authorization",
                         "in": "header",
                         "required": true
@@ -256,6 +262,9 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request"
+                    },
+                    "403": {
+                        "description": "Forbidden"
                     },
                     "500": {
                         "description": "Internal Server Error"
@@ -301,7 +310,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "authorization token (value: \\",
+                        "description": "authorization token (value: Bearer \u003cjwt-token\u003e)",
                         "name": "Authorization",
                         "in": "header",
                         "required": true
@@ -332,6 +341,9 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request"
                     },
+                    "403": {
+                        "description": "Forbidden"
+                    },
                     "500": {
                         "description": "Internal Server Error"
                     }
@@ -351,7 +363,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "authorization token (value: \\",
+                        "description": "authorization token (value: Bearer \u003cjwt-token\u003e)",
                         "name": "Authorization",
                         "in": "header",
                         "required": true
@@ -385,7 +397,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "authorization token (value: \\",
+                        "description": "authorization token (value: Bearer \u003cjwt-token\u003e)",
                         "name": "Authorization",
                         "in": "header",
                         "required": true
@@ -431,7 +443,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "authorization token (value: \\",
+                        "description": "authorization token (value: Bearer \u003cjwt-token\u003e)",
                         "name": "Authorization",
                         "in": "header",
                         "required": true
@@ -474,7 +486,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "authorization token (value: \\",
+                        "description": "authorization token (value: Bearer \u003cjwt-token\u003e)",
                         "name": "Authorization",
                         "in": "header",
                         "required": true
@@ -508,7 +520,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "authorization token (value: \\",
+                        "description": "authorization token (value: Bearer \u003cjwt-token\u003e)",
                         "name": "Authorization",
                         "in": "header",
                         "required": true
@@ -542,7 +554,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "authorization token (value: \\",
+                        "description": "authorization token (value: Bearer \u003cjwt-token\u003e)",
                         "name": "Authorization",
                         "in": "header",
                         "required": true
@@ -576,7 +588,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "authorization token (value: \\",
+                        "description": "authorization token (value: Bearer \u003cjwt-token\u003e)",
                         "name": "Authorization",
                         "in": "header",
                         "required": true
@@ -622,7 +634,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "authorization token (value: \\",
+                        "description": "authorization token (value: Bearer \u003cjwt-token\u003e)",
                         "name": "Authorization",
                         "in": "header",
                         "required": true
@@ -652,6 +664,9 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request"
+                    },
+                    "403": {
+                        "description": "Forbidden"
                     },
                     "500": {
                         "description": "Internal Server Error"
@@ -697,7 +712,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "authorization token (value: \\",
+                        "description": "authorization token (value: Bearer \u003cjwt-token\u003e)",
                         "name": "Authorization",
                         "in": "header",
                         "required": true
@@ -728,6 +743,9 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request"
                     },
+                    "403": {
+                        "description": "Forbidden"
+                    },
                     "500": {
                         "description": "Internal Server Error"
                     }
@@ -747,7 +765,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "authorization token (value: \\",
+                        "description": "authorization token (value: Bearer \u003cjwt-token\u003e)",
                         "name": "Authorization",
                         "in": "header",
                         "required": true
@@ -759,6 +777,9 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request"
+                    },
+                    "403": {
+                        "description": "Forbidden"
                     },
                     "500": {
                         "description": "Internal Server Error"
@@ -781,7 +802,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "authorization token (value: \\",
+                        "description": "authorization token (value: Bearer \u003cjwt-token\u003e)",
                         "name": "Authorization",
                         "in": "header",
                         "required": true
@@ -820,7 +841,52 @@ const docTemplate = `{
         },
         "/users/login": {
             "post": {
-                "description": "login (user1: username: admin password: 1234 , user2: username:test password: test)",
+                "description": "login",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "parameters": [
+                    {
+                        "description": "username",
+                        "name": "username",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "password",
+                        "name": "password",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/users/register": {
+            "post": {
+                "description": "register",
                 "consumes": [
                     "application/json"
                 ],

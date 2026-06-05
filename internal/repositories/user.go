@@ -8,6 +8,9 @@ import (
 
 type UserRepository interface {
 	GetByUsername(username string) (models.User, error)
+	Create(user *models.User) error
+	Update(user models.User) error
+	Delete(userID uint64) error
 }
 
 type userRepository struct {
@@ -31,4 +34,17 @@ func (r *userRepository) GetByUsername(username string) (models.User, error) {
 	}
 
 	return user, nil
+}
+
+func (r *userRepository) Create(user *models.User) error {
+	return r.db.Create(user).Error
+}
+
+func (r *userRepository) Update(user models.User) error {
+	return r.db.Updates(&user).Error
+
+}
+
+func (r *userRepository) Delete(userId uint64) error {
+	return r.db.Delete(models.User{ID: userId}).Error
 }

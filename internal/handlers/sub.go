@@ -34,7 +34,7 @@ func NewSubHandler(service services.SubService, response response.JsonResponse) 
 	}
 }
 
-// CreatePost godoc
+// CreateSpace godoc
 // @Description create a space
 // @Tags spaces
 // @Accept json
@@ -70,7 +70,7 @@ func (h *subHandler) Create(c *gin.Context) {
 	h.response.Response(c, http.StatusOK, responseDTO.ResponseCode, responseDTO.Data)
 }
 
-// UpdatePost godoc
+// UpdateSpace godoc
 // @Description update a space title or description
 // @Tags spaces
 // @Accept json
@@ -118,7 +118,7 @@ func (h *subHandler) Update(c *gin.Context) {
 	h.response.Response(c, http.StatusOK, responseDTO.ResponseCode, responseDTO.Data)
 }
 
-// DeletePost godoc
+// DeleteSpace godoc
 // @Description delete a space
 // @Tags spaces
 // @Accept json
@@ -158,7 +158,7 @@ func (h *subHandler) Delete(c *gin.Context) {
 	h.response.Response(c, http.StatusOK, responseDTO.ResponseCode, responseDTO.Data)
 }
 
-// GetAllPosts godoc
+// GetAllSpaces godoc
 // @Description get all spaces by page
 // @Tags spaces
 // @Accept json
@@ -211,7 +211,7 @@ func (h *subHandler) GetAll(c *gin.Context) {
 	h.response.Response(c, http.StatusOK, responseDTO.ResponseCode, responseDTO.Data)
 }
 
-// GetPost godoc
+// GetSpace godoc
 // @Description get a space by ID
 // @Tags spaces
 // @Accept json

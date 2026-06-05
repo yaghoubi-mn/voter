@@ -15,6 +15,7 @@ func SetupRoutes(r *gin.Engine, authMiddleware middleware.AuthMiddleware, userHa
 
 	// users
 	v1.POST("/users/login", userHandlers.Login)
+	v1.POST("/users/register", userHandlers.Register)
 
 	authV1 := v1.Group("/")
 	authV1.Use(authMiddleware.Auth())
