@@ -13,10 +13,13 @@ import (
 	ginswagger "github.com/swaggo/gin-swagger"
 	docs "github.com/yaghoubi-mn/voter/docs"
 	"github.com/yaghoubi-mn/voter/internal/cache"
+	"github.com/yaghoubi-mn/voter/internal/config"
 	"github.com/yaghoubi-mn/voter/internal/database"
+	"github.com/yaghoubi-mn/voter/internal/enums"
 	"github.com/yaghoubi-mn/voter/internal/handlers"
 	"github.com/yaghoubi-mn/voter/internal/middleware"
 	"github.com/yaghoubi-mn/voter/internal/models"
+	"github.com/yaghoubi-mn/voter/internal/permissions"
 	"github.com/yaghoubi-mn/voter/internal/repositories"
 	"github.com/yaghoubi-mn/voter/internal/routes"
 	"github.com/yaghoubi-mn/voter/internal/services"
@@ -69,22 +72,32 @@ func main() {
 
 	// repositories
 	userRepository := repositories.NewUserRepository(db)
+	subRepository := repositories.NewSubRepository(db)
 	postRepository := repositories.NewPostRepository(db)
 	commentRepository := repositories.NewCommentRepository(db)
 	commentVoteRepository := repositories.NewCommentVoteRepository(db)
 	postVoteRepository := repositories.NewPostVoteRepository(db)
 
+	// permissions
+	subPermissions := permissions.NewSubPermission(&config.Settings{
+		SubCreationPermission: enums.PermissionAll,
+		SubClosePermission:    enums.PermissionAdmin,
+		SubDeletePermission:   enums.PermissionAdmin,
+	})
+
 	// services
 	userService := services.NewUserService(userRepository, validate)
+	subService := services.NewSubService(subRepository, validate, subPermissions)
 	postService := services.NewPostService(postRepository, postVoteRepository, validate, redisCache)
 	commentService := services.NewCommentService(commentRepository, commentVoteRepository, postRepository, validate, redisCache)
 
 	// handlers
 	userHandler := handlers.NewUserHandler(userService, response)
+	subHandler := handlers.NewSubHandler(subService, response)
 	postHandler := handlers.NewPostHandler(postService, response)
 	commentHandler := handlers.NewCommentHandler(commentService, response)
 
-	routes.SetupRoutes(r, authMiddleware, userHandler, postHandler, commentHandler)
+	routes.SetupRoutes(r, authMiddleware, userHandler, subHandler, postHandler, commentHandler)
 
 	r.Run()
 }

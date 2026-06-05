@@ -2,7 +2,6 @@ package cache
 
 import (
 	"context"
-	"fmt"
 	"os"
 
 	"github.com/redis/go-redis/v9"
@@ -10,10 +9,10 @@ import (
 )
 
 type Cache interface {
-	Get(model string, id uint64) (string, error)
-	Set(model string, id uint64, data string) error
+	Get(key string) (string, error)
+	Set(key string, data string) error
 	FlushDB() error
-	Del(models string, id uint64) error
+	Del(key string) error
 }
 
 type cache struct {
@@ -48,17 +47,15 @@ func Setup() (*redis.Client, error) {
 	return redisClient, nil
 }
 
-func (c *cache) Set(model string, id uint64, data string) error {
+func (c *cache) Set(key string, data string) error {
 
-	err := c.redisClient.Set(c.ctx, fmt.Sprintf("%v:%v", model, id), data, config.RedisExpiration).Err()
-
+	err := c.redisClient.Set(c.ctx, key, data, config.RedisExpiration).Err()
 	return err
 }
 
-func (c *cache) Get(model string, id uint64) (string, error) {
+func (c *cache) Get(key string) (string, error) {
 
-	data, err := c.redisClient.Get(c.ctx, fmt.Sprintf("%v:%v", model, id)).Result()
-
+	data, err := c.redisClient.Get(c.ctx, key).Result()
 	return data, err
 }
 
@@ -66,6 +63,6 @@ func (c *cache) FlushDB() error {
 	return c.redisClient.FlushDB(c.ctx).Err()
 }
 
-func (c *cache) Del(model string, id uint64) error {
-	return c.redisClient.Del(c.ctx, fmt.Sprintf("%v:%v", model, id)).Err()
+func (c *cache) Del(key string) error {
+	return c.redisClient.Del(c.ctx, key).Err()
 }

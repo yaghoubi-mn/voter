@@ -3,6 +3,7 @@ package services
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log/slog"
 	"strings"
 	"time"
@@ -17,7 +18,7 @@ import (
 )
 
 type PostService interface {
-	Create(postInput dtos.PostInput, user models.User) dtos.ResponseDTO
+	Create(postInput dtos.PostInput, subID uint64, user models.User) dtos.ResponseDTO
 	Update(postInput dtos.PostInput, postId uint64, user models.User) dtos.ResponseDTO
 	Delete(postId uint64, user models.User) dtos.ResponseDTO
 	GetAll(sortBy enums.SortBy, page int) dtos.ResponseDTO
@@ -42,7 +43,7 @@ func NewPostService(repo repositories.PostRepository, voteRepo repositories.Post
 	}
 }
 
-func (s *postService) Create(postInput dtos.PostInput, user models.User) (responseDTO dtos.ResponseDTO) {
+func (s *postService) Create(postInput dtos.PostInput, subID uint64, user models.User) (responseDTO dtos.ResponseDTO) {
 
 	responseDTO.Data = make(map[string]any)
 
@@ -63,8 +64,14 @@ func (s *postService) Create(postInput dtos.PostInput, user models.User) (respon
 	post.Title = postInput.Title
 	post.Content = postInput.Content
 	post.AuthorID = user.ID
+	post.SubID = subID
 
 	if err := s.repo.Create(post); err != nil {
+		if err == custom_errors.RecordNotFound {
+			responseDTO.ResponseCode = "invalid_sub_id"
+			responseDTO.UserErrs = []error{errors.New("sub id not found")}
+			return
+		}
 		responseDTO.ServerErr = err
 		return
 	}
@@ -173,11 +180,11 @@ func (s *postService) Delete(postId uint64, user models.User) (responseDTO dtos.
 func (s *postService) GetAll(sortBy enums.SortBy, page int) (responseDTO dtos.ResponseDTO) {
 	responseDTO.Data = make(map[string]any)
 
-	cacheName := "post_page_" + string(sortBy)
+	cacheName := "post_page_" + string(sortBy) + ":" + fmt.Sprint(page)
 
 	var posts []models.Post
-	// get data from database
-	data, err := s.cache.Get(cacheName, uint64(page))
+	// get data from cache
+	data, err := s.cache.Get(cacheName)
 	if err != nil {
 
 		// get data from database
@@ -195,7 +202,7 @@ func (s *postService) GetAll(sortBy enums.SortBy, page int) (responseDTO dtos.Re
 
 		} else {
 
-			err = s.cache.Set(cacheName, uint64(page), string(data))
+			err = s.cache.Set(cacheName, string(data))
 			if err != nil {
 				slog.Error("cannot cache data", "error", err)
 			}
@@ -217,11 +224,11 @@ func (s *postService) GetAll(sortBy enums.SortBy, page int) (responseDTO dtos.Re
 func (s *postService) GetByID(postId uint64) (responseDTO dtos.ResponseDTO) {
 	responseDTO.Data = make(map[string]any)
 
-	cacheName := "post"
+	cacheName := "post:" + fmt.Sprint(postId)
 
 	var post models.Post
 
-	data, err := s.cache.Get(cacheName, postId)
+	data, err := s.cache.Get(cacheName)
 	if err != nil {
 
 		// get data from database
@@ -236,7 +243,7 @@ func (s *postService) GetByID(postId uint64) (responseDTO dtos.ResponseDTO) {
 			slog.Error("cannot marshal post", "error", err)
 		} else {
 
-			err = s.cache.Set(cacheName, postId, string(data))
+			err = s.cache.Set(cacheName, string(data))
 			if err != nil {
 				slog.Error("cannot cache data", "error", err)
 			}

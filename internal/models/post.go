@@ -13,6 +13,9 @@ type Post struct {
 
 	AuthorID uint64
 	Author   User `gorm:"constraint:OnDelete:CASCADE;"`
+
+	SubID uint64
+	Sub   Sub `gorm:"constraint:OnDelete:CASCADE;"`
 }
 
 type PostVote struct {

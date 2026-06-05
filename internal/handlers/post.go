@@ -48,7 +48,7 @@ func NewPostHandler(service services.PostService, response response.JsonResponse
 // @Success 200
 // @Failure 400
 // @Failure 500
-// @Router /posts/ [post]
+// @Router /subs/:subId/posts [post]
 func (h *postHandler) Create(c *gin.Context) {
 	var postInput dtos.PostInput
 
@@ -62,7 +62,20 @@ func (h *postHandler) Create(c *gin.Context) {
 		h.response.ServerErrorResponse(c, errors.New("user not found in context"))
 		return
 	}
-	responseDTO := h.service.Create(postInput, user.(models.User))
+
+	// get subId from url
+	subIdString, ok := c.Params.Get("subId")
+	if !ok {
+		h.response.ErrorResponse(c, http.StatusBadRequest, "sub_id_not_found_in_url", nil, errors.New("sub_id: sub id not found in url params"))
+		return
+	}
+	subId, err := strconv.Atoi(subIdString)
+	if err != nil {
+		h.response.ErrorResponse(c, http.StatusBadRequest, "invalid_sub_id", nil, errors.New("sub_id: invalid post id"))
+		return
+	}
+
+	responseDTO := h.service.Create(postInput, uint64(subId), user.(models.User))
 	if responseDTO.ServerErr != nil || responseDTO.UserErrs != nil {
 		h.response.ServerOrUserErrorResponse(c, responseDTO.Status, responseDTO.ServerErr, responseDTO.UserErrs, responseDTO.ResponseCode)
 		return

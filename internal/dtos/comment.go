@@ -6,8 +6,8 @@ import (
 )
 
 type CommentInput struct {
-	Content        string `json:"content" validate:"required"`
-	ReplyCommentID uint64 `json:"reply_comment_id"`
+	Content  string `json:"content" validate:"required"`
+	ParentID uint64 `json:"parent_id"`
 }
 
 type CommentOutput struct {
@@ -18,7 +18,7 @@ type CommentOutput struct {
 	ModifiedAt     string `json:"modified_at"`
 	AuthorID       uint64 `json:"author_id"`
 	AuthorUsername string `json:"author_username"`
-	ReplyCommentID uint64 `json:"reply_comment_id"`
+	ParentID       uint64 `json:"parent_id"`
 }
 
 func GetCommentOutputFromComment(comment models.Comment) CommentOutput {
@@ -30,6 +30,6 @@ func GetCommentOutputFromComment(comment models.Comment) CommentOutput {
 		ModifiedAt:     comment.ModifiedAt.Format(config.TimeFormat),
 		AuthorID:       comment.AuthorID,
 		AuthorUsername: comment.Author.Username,
-		ReplyCommentID: comment.CommentID,
+		ParentID:       comment.ParentID,
 	}
 }

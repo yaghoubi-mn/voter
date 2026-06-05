@@ -31,7 +31,14 @@ func NewPostRepository(db *gorm.DB) PostRepository {
 }
 
 func (r *postRepository) Create(post models.Post) error {
-	return r.db.Create(&post).Error
+
+	if err := r.db.Create(&post).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return custom_errors.RecordNotFound
+		}
+		return err
+	}
+	return nil
 }
 
 func (r *postRepository) Update(post models.Post) error {

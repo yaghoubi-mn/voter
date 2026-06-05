@@ -3,6 +3,7 @@ package services
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log/slog"
 	"strings"
 	"time"
@@ -76,8 +77,8 @@ func (s *commentService) Create(commentInput dtos.CommentInput, postId uint64, u
 	}
 
 	// check reply comment exists
-	if commentInput.ReplyCommentID != 0 {
-		_, err := s.repo.GetByID(commentInput.ReplyCommentID)
+	if commentInput.ParentID != 0 {
+		_, err := s.repo.GetByID(commentInput.ParentID)
 		if err != nil {
 			if err == custom_errors.RecordNotFound {
 				responseDTO.UserErrs = []error{errors.New("reply_comment_id: reply comment not found")}
@@ -240,12 +241,12 @@ func (s *commentService) Delete(commentId uint64, user models.User) (responseDTO
 func (s *commentService) GetAll(postId uint64, sortBy enums.SortBy, page int) (responseDTO dtos.ResponseDTO) {
 	responseDTO.Data = make(map[string]any)
 
-	cacheName := "comment_page_" + string(sortBy)
+	cacheName := "comment_page_" + string(sortBy) + ":" + fmt.Sprint(postId)
 
 	var comments []models.Comment
 
 	// get data from cache
-	data, err := s.cache.Get(cacheName, postId)
+	data, err := s.cache.Get(cacheName)
 	if err != nil {
 
 		// get data from database
@@ -260,7 +261,7 @@ func (s *commentService) GetAll(postId uint64, sortBy enums.SortBy, page int) (r
 		if err != nil {
 			slog.Error("cannot marshal data", "error", err)
 		}
-		err = s.cache.Set(cacheName, postId, string(data))
+		err = s.cache.Set(cacheName, string(data))
 		if err != nil {
 			slog.Error("cannot cache data", "error", err)
 		}
@@ -281,11 +282,11 @@ func (s *commentService) GetAll(postId uint64, sortBy enums.SortBy, page int) (r
 func (s *commentService) GetByID(commentId uint64) (responseDTO dtos.ResponseDTO) {
 	responseDTO.Data = make(map[string]any)
 
-	cacheName := "comment"
+	cacheName := "comment:" + fmt.Sprint(commentId)
 
 	var comment models.Comment
 	// get data from cache
-	data, err := s.cache.Get(cacheName, commentId)
+	data, err := s.cache.Get(cacheName)
 	if err != nil {
 		// get data from database
 		comment, err = s.repo.GetByID(commentId)
@@ -305,7 +306,7 @@ func (s *commentService) GetByID(commentId uint64) (responseDTO dtos.ResponseDTO
 		if err != nil {
 			slog.Error("cannot marshal data", "error", err)
 		}
-		err = s.cache.Set(cacheName, commentId, string(data))
+		err = s.cache.Set(cacheName, string(data))
 		if err != nil {
 			slog.Error("cannot cache data", "error", err)
 		}

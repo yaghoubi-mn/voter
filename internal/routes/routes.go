@@ -6,7 +6,7 @@ import (
 	"github.com/yaghoubi-mn/voter/internal/middleware"
 )
 
-func SetupRoutes(r *gin.Engine, authMiddleware middleware.AuthMiddleware, userHandlers handlers.UserHandler, postHandler handlers.PostHandler, commentHandler handlers.CommentHandler) {
+func SetupRoutes(r *gin.Engine, authMiddleware middleware.AuthMiddleware, userHandlers handlers.UserHandler, subHandler handlers.SubHandler, postHandler handlers.PostHandler, commentHandler handlers.CommentHandler) {
 
 	// middlewares
 	// r.Use(middleware.Auth())
@@ -19,8 +19,15 @@ func SetupRoutes(r *gin.Engine, authMiddleware middleware.AuthMiddleware, userHa
 	authV1 := v1.Group("/")
 	authV1.Use(authMiddleware.Auth())
 
+	// Subs
+	authV1.POST("/spaces", subHandler.Create)
+	authV1.PUT("/spaces/:spaceId", subHandler.Update)
+	authV1.DELETE("/spaces/:spaceId", subHandler.Delete)
+	v1.GET("/spaces", subHandler.GetAll)
+	v1.GET("/spaces/:spaceId", subHandler.GetByID)
+
 	// posts
-	authV1.POST("/posts", postHandler.Create)
+	authV1.POST("/spaces/:subId/post", postHandler.Create)
 	authV1.PUT("/posts/:postId", postHandler.Update)
 	authV1.DELETE("/posts/:postId", postHandler.Delete)
 	v1.GET("/posts", postHandler.GetAll)
