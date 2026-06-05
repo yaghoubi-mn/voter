@@ -166,39 +166,6 @@ paths:
           description: Internal Server Error
       tags:
       - posts
-    post:
-      consumes:
-      - application/json
-      description: create a post
-      parameters:
-      - description: 'authorization token (value: \'
-        in: header
-        name: Authorization
-        required: true
-        type: string
-      - description: post title
-        in: body
-        name: title
-        required: true
-        schema:
-          type: string
-      - description: post content
-        in: body
-        name: content
-        required: true
-        schema:
-          type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-        "400":
-          description: Bad Request
-        "500":
-          description: Internal Server Error
-      tags:
-      - posts
   /posts/:postId:
     delete:
       consumes:
@@ -383,6 +350,175 @@ paths:
         name: Authorization
         required: true
         type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      tags:
+      - posts
+  /spaces:
+    get:
+      consumes:
+      - application/json
+      description: get all spaces by page
+      parameters:
+      - description: 'authorization token (value: \'
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: page number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - description: \
+        in: query
+        name: sort_by
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      tags:
+      - spaces
+    post:
+      consumes:
+      - application/json
+      description: create a space
+      parameters:
+      - description: 'authorization token (value: \'
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: space title
+        in: body
+        name: title
+        required: true
+        schema:
+          type: string
+      - description: space description
+        in: body
+        name: description
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      tags:
+      - spaces
+  /spaces/:spaceId:
+    delete:
+      consumes:
+      - application/json
+      description: delete a space
+      parameters:
+      - description: 'authorization token (value: \'
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      tags:
+      - spaces
+    get:
+      consumes:
+      - application/json
+      description: get a space by ID
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      tags:
+      - spaces
+    put:
+      consumes:
+      - application/json
+      description: update a space title or description
+      parameters:
+      - description: 'authorization token (value: \'
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: space title
+        in: body
+        name: title
+        required: true
+        schema:
+          type: string
+      - description: space description
+        in: body
+        name: description
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      tags:
+      - spaces
+  /subs/:subId/posts:
+    post:
+      consumes:
+      - application/json
+      description: create a post
+      parameters:
+      - description: 'authorization token (value: \'
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: post title
+        in: body
+        name: title
+        required: true
+        schema:
+          type: string
+      - description: post content
+        in: body
+        name: content
+        required: true
+        schema:
+          type: string
       produces:
       - application/json
       responses:
