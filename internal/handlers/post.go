@@ -42,7 +42,7 @@ func NewPostHandler(service services.PostService, response response.JsonResponse
 // @Tags posts
 // @Accept json
 // @Produce json
-// @Param Authorization header string true "authorization token (value: \"Bearer <jwt-token>\")"
+// @Param Authorization header string true "authorization token (value: Bearer <jwt-token>)"
 // @Param title body string true "post title"
 // @Param content body string true "post content"
 // @Success 200
@@ -89,11 +89,12 @@ func (h *postHandler) Create(c *gin.Context) {
 // @Tags posts
 // @Accept json
 // @Produce json
-// @Param Authorization header string true "authorization token (value: \"Bearer <jwt-token>\")"
+// @Param Authorization header string true "authorization token (value: Bearer <jwt-token>)"
 // @Param title body string true "post title"
 // @Param content body string true "post content"
 // @Success 200
 // @Failure 400
+// @Failure 403
 // @Failure 500
 // @Router /posts/:postId [put]
 func (h *postHandler) Update(c *gin.Context) {
@@ -136,7 +137,7 @@ func (h *postHandler) Update(c *gin.Context) {
 // @Tags posts
 // @Accept json
 // @Produce json
-// @Param Authorization header string true "authorization token (value: \"Bearer <jwt-token>\")"
+// @Param Authorization header string true "authorization token (value: Bearer <jwt-token>)"
 // @Success 200
 // @Failure 400
 // @Failure 500
@@ -175,11 +176,12 @@ func (h *postHandler) Delete(c *gin.Context) {
 // @Tags posts
 // @Accept json
 // @Produce json
-// @Param Authorization header string true "authorization token (value: \"Bearer <jwt-token>\")"
+// @Param Authorization header string true "authorization token (value: Bearer <jwt-token>)"
 // @Param page query integer true "page number"
 // @Param sort_by query string true "\"date\" or \"score\""
 // @Success 200
 // @Failure 400
+// @Failure 403
 // @Failure 500
 // @Router /posts/ [get]
 func (h *postHandler) GetAll(c *gin.Context) {
@@ -262,7 +264,7 @@ func (h *postHandler) GetByID(c *gin.Context) {
 // @Tags posts
 // @Accept json
 // @Produce json
-// @Param Authorization header string true "authorization token (value: \"Bearer <jwt-token>\")"
+// @Param Authorization header string true "authorization token (value: Bearer <jwt-token>)"
 // @Success 200
 // @Failure 400
 // @Failure 500
@@ -301,7 +303,7 @@ func (h *postHandler) UpVote(c *gin.Context) {
 // @Tags posts
 // @Accept json
 // @Produce json
-// @Param Authorization header string true "authorization token (value: \"Bearer <jwt-token>\")"
+// @Param Authorization header string true "authorization token (value: Bearer <jwt-token>)"
 // @Success 200
 // @Failure 400
 // @Failure 500
@@ -340,7 +342,7 @@ func (h *postHandler) DownVote(c *gin.Context) {
 // @Tags posts
 // @Accept json
 // @Produce json
-// @Param Authorization header string true "authorization token (value: \"Bearer <jwt-token>\")"
+// @Param Authorization header string true "authorization token (value: Bearer <jwt-token>)"
 // @Success 200
 // @Failure 400
 // @Failure 500

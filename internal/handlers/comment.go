@@ -42,7 +42,7 @@ func NewCommentHandler(service services.CommentService, response response.JsonRe
 // @Tags comments
 // @Accept json
 // @Produce json
-// @Param Authorization header string true "authorization token (value: \"Bearer <jwt-token>\")"
+// @Param Authorization header string true "authorization token (value: Bearer <jwt-token>)"
 // @Param content body string true "post content"
 // @Success 200
 // @Failure 400
@@ -87,10 +87,11 @@ func (h *commentHandler) Create(c *gin.Context) {
 // @Tags comments
 // @Accept json
 // @Produce json
-// @Param Authorization header string true "authorization token (value: \"Bearer <jwt-token>\")"
+// @Param Authorization header string true "authorization token (value: Bearer <jwt-token>)"
 // @Param content body string true "post content"
 // @Success 200
 // @Failure 400
+// @Failure 403
 // @Failure 500
 // @Router /comments/:commentId [put]
 func (h *commentHandler) Update(c *gin.Context) {
@@ -133,9 +134,10 @@ func (h *commentHandler) Update(c *gin.Context) {
 // @Tags comments
 // @Accept json
 // @Produce json
-// @Param Authorization header string true "authorization token (value: \"Bearer <jwt-token>\")"
+// @Param Authorization header string true "authorization token (value: Bearer <jwt-token>)"
 // @Success 200
 // @Failure 400
+// @Failure 403
 // @Failure 500
 // @Router /comments/:commentId [delete]
 func (h *commentHandler) Delete(c *gin.Context) {
@@ -172,7 +174,7 @@ func (h *commentHandler) Delete(c *gin.Context) {
 // @Tags comments
 // @Accept json
 // @Produce json
-// @Param Authorization header string true "authorization token (value: \"Bearer <jwt-token>\")"
+// @Param Authorization header string true "authorization token (value: Bearer <jwt-token>)"
 // @Param page query integer true "page number"
 // @Param sort_by query string true "\"date\" or \"score\""
 // @Success 200
@@ -264,7 +266,7 @@ func (h *commentHandler) GetByID(c *gin.Context) {
 // @Tags comments
 // @Accept json
 // @Produce json
-// @Param Authorization header string true "authorization token (value: \"Bearer <jwt-token>\")"
+// @Param Authorization header string true "authorization token (value: Bearer <jwt-token>)"
 // @Success 200
 // @Failure 400
 // @Failure 500
@@ -303,7 +305,7 @@ func (h *commentHandler) UpVote(c *gin.Context) {
 // @Tags comments
 // @Accept json
 // @Produce json
-// @Param Authorization header string true "authorization token (value: \"Bearer <jwt-token>\")"
+// @Param Authorization header string true "authorization token (value: Bearer <jwt-token>)"
 // @Success 200
 // @Failure 400
 // @Failure 500
@@ -342,7 +344,7 @@ func (h *commentHandler) DownVote(c *gin.Context) {
 // @Tags comments
 // @Accept json
 // @Produce json
-// @Param Authorization header string true "authorization token (value: \"Bearer <jwt-token>\")"
+// @Param Authorization header string true "authorization token (value: Bearer <jwt-token>)"
 // @Success 200
 // @Failure 400
 // @Failure 500

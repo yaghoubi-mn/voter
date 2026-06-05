@@ -39,11 +39,12 @@ func NewSubHandler(service services.SubService, response response.JsonResponse) 
 // @Tags spaces
 // @Accept json
 // @Produce json
-// @Param Authorization header string true "authorization token (value: \"Bearer <jwt-token>\")"
+// @Param Authorization header string true "authorization token (value: Bearer <jwt-token>)"
 // @Param title body string true "space title"
 // @Param description body string true "space description"
 // @Success 200
 // @Failure 400
+// @Failure 403
 // @Failure 500
 // @Router /spaces [post]
 func (h *subHandler) Create(c *gin.Context) {
@@ -74,11 +75,12 @@ func (h *subHandler) Create(c *gin.Context) {
 // @Tags spaces
 // @Accept json
 // @Produce json
-// @Param Authorization header string true "authorization token (value: \"Bearer <jwt-token>\")"
+// @Param Authorization header string true "authorization token (value: Bearer <jwt-token>)"
 // @Param title body string true "space title"
 // @Param description body string true "space description"
 // @Success 200
 // @Failure 400
+// @Failure 403
 // @Failure 500
 // @Router /spaces/:spaceId [put]
 func (h *subHandler) Update(c *gin.Context) {
@@ -121,9 +123,10 @@ func (h *subHandler) Update(c *gin.Context) {
 // @Tags spaces
 // @Accept json
 // @Produce json
-// @Param Authorization header string true "authorization token (value: \"Bearer <jwt-token>\")"
+// @Param Authorization header string true "authorization token (value: Bearer <jwt-token>)"
 // @Success 200
 // @Failure 400
+// @Failure 403
 // @Failure 500
 // @Router /spaces/:spaceId [delete]
 func (h *subHandler) Delete(c *gin.Context) {
@@ -160,7 +163,7 @@ func (h *subHandler) Delete(c *gin.Context) {
 // @Tags spaces
 // @Accept json
 // @Produce json
-// @Param Authorization header string true "authorization token (value: \"Bearer <jwt-token>\")"
+// @Param Authorization header string true "authorization token (value: Bearer <jwt-token>)"
 // @Param page query integer true "page number"
 // @Param sort_by query string true "\"date\"
 // @Success 200
