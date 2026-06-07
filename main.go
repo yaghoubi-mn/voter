@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -61,7 +62,13 @@ func main() {
 	r := gin.Default()
 
 	// setup cors middleware
-	r.Use(cors.Default()) // change this on production
+	r.Use(cors.New(cors.Config{
+		AllowAllOrigins:  true,
+		AllowMethods:     []string{"*"},
+		AllowHeaders:     []string{"*"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	})) // change this on production
 
 	// setup swagger
 	docs.SwaggerInfo.BasePath = "/api/v1"
