@@ -35,6 +35,10 @@ definitions:
         type: string
       score:
         type: integer
+      space_id:
+        type: integer
+      space_username:
+        type: string
       title:
         type: string
     type: object
@@ -49,6 +53,8 @@ definitions:
       subscribersCount:
         type: integer
       title:
+        type: string
+      username:
         type: string
       views:
         type: integer
@@ -78,7 +84,7 @@ definitions:
     type: object
 info:
   contact: {}
-  title: Voter
+  title: Veteria (Previously Voter)
   version: "1.0"
 paths:
   /comments/:commentId:
@@ -258,11 +264,11 @@ paths:
             $ref: '#/definitions/response.ErrorResponse'
       tags:
       - comments
-  /posts/:
+  /posts:
     get:
       consumes:
       - application/json
-      description: get all posts by page
+      description: Get all posts by page. This URL is for home page.
       parameters:
       - description: 'authorization token (value: Bearer <jwt-token>)'
         in: header
@@ -469,7 +475,12 @@ paths:
         "200":
           description: successfully created
           schema:
-            $ref: '#/definitions/response.SuccessResponse'
+            allOf:
+            - $ref: '#/definitions/response.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dtos.CommentOutput'
+              type: object
         "400":
           description: falied
           schema:
@@ -568,7 +579,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: get all spaces by page
+      description: Get all spaces by page. Page paramenters in URL is required!
       parameters:
       - description: 'authorization token (value: Bearer <jwt-token>)'
         in: header
@@ -637,7 +648,12 @@ paths:
         "200":
           description: successfully created
           schema:
-            $ref: '#/definitions/response.SuccessResponse'
+            allOf:
+            - $ref: '#/definitions/response.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dtos.SpaceOutput'
+              type: object
         "400":
           description: falied
           schema:
@@ -747,6 +763,55 @@ paths:
             $ref: '#/definitions/response.ErrorResponse'
       tags:
       - spaces
+  /spaces/:spaceId/posts:
+    get:
+      consumes:
+      - application/json
+      description: get all posts of a space by page
+      parameters:
+      - description: 'authorization token (value: Bearer <jwt-token>)'
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: page number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - description: \
+        in: query
+        name: sort_by
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully fetched
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.SuccessResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dtos.PostOutput'
+                  type: array
+              type: object
+        "400":
+          description: falied
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "403":
+          description: Access Denied
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      tags:
+      - posts
   /subs/:subId/posts:
     post:
       consumes:
@@ -776,7 +841,12 @@ paths:
         "200":
           description: successfully created
           schema:
-            $ref: '#/definitions/response.SuccessResponse'
+            allOf:
+            - $ref: '#/definitions/response.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dtos.PostOutput'
+              type: object
         "400":
           description: falied
           schema:

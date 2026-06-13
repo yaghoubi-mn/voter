@@ -290,9 +290,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/posts/": {
+        "/posts": {
             "get": {
-                "description": "get all posts by page",
+                "description": "Get all posts by page. This URL is for home page.",
                 "consumes": [
                     "application/json"
                 ],
@@ -621,7 +621,19 @@ const docTemplate = `{
                     "200": {
                         "description": "successfully created",
                         "schema": {
-                            "$ref": "#/definitions/response.SuccessResponse"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dtos.CommentOutput"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
@@ -770,7 +782,7 @@ const docTemplate = `{
         },
         "/spaces": {
             "get": {
-                "description": "get all spaces by page",
+                "description": "Get all spaces by page. Page paramenters in URL is required!",
                 "consumes": [
                     "application/json"
                 ],
@@ -881,7 +893,19 @@ const docTemplate = `{
                     "200": {
                         "description": "successfully created",
                         "schema": {
-                            "$ref": "#/definitions/response.SuccessResponse"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dtos.SpaceOutput"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
@@ -1054,6 +1078,84 @@ const docTemplate = `{
                 }
             }
         },
+        "/spaces/:spaceId/posts": {
+            "get": {
+                "description": "get all posts of a space by page",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "posts"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "authorization token (value: Bearer \u003cjwt-token\u003e)",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page number",
+                        "name": "page",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "\\",
+                        "name": "sort_by",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully fetched",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/dtos.PostOutput"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "falied",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Access Denied",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/subs/:subId/posts": {
             "post": {
                 "description": "create a post",
@@ -1097,7 +1199,19 @@ const docTemplate = `{
                     "200": {
                         "description": "successfully created",
                         "schema": {
-                            "$ref": "#/definitions/response.SuccessResponse"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dtos.PostOutput"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
@@ -1308,6 +1422,12 @@ const docTemplate = `{
                 "score": {
                     "type": "integer"
                 },
+                "space_id": {
+                    "type": "integer"
+                },
+                "space_username": {
+                    "type": "string"
+                },
                 "title": {
                     "type": "string"
                 }
@@ -1329,6 +1449,9 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "title": {
+                    "type": "string"
+                },
+                "username": {
                     "type": "string"
                 },
                 "views": {
@@ -1380,7 +1503,7 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "",
 	BasePath:         "/api/v1/",
 	Schemes:          []string{},
-	Title:            "Voter",
+	Title:            "Veteria (Previously Voter)",
 	Description:      "",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
