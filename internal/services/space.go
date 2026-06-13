@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"strings"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/yaghoubi-mn/voter/internal/custom_errors"
@@ -18,6 +19,8 @@ type SpaceService interface {
 	Delete(spaceId uint64, user models.User) dtos.ResponseDTO
 	GetAll(sortBy enums.SortBy, page int) dtos.ResponseDTO
 	GetByID(spaceId uint64) dtos.ResponseDTO
+	Subscribe(spaceId uint64, user models.User) dtos.ResponseDTO
+	Unsubscribe(spaceId uint64, user models.User) dtos.ResponseDTO
 }
 
 type spaceService struct {
@@ -195,5 +198,44 @@ func (s *spaceService) GetByID(spaceId uint64) (responseDTO dtos.ResponseDTO) {
 
 	spaceOutput := dtos.GetSubOutputFromSub(space)
 	responseDTO.Data = spaceOutput
+	return
+}
+
+func (s spaceService) Subscribe(spaceId uint64, user models.User) (responseDTO dtos.ResponseDTO) {
+
+	if err := s.repo.SubscribeSub(user.ID, spaceId); err != nil {
+		if strings.Contains(err.Error(), "SQLSTATE 23503") {
+			responseDTO.UserErrs = []error{errors.New("spaceId: space id not found")}
+			responseDTO.ResponseCode = "not_found"
+			responseDTO.Status = 404
+			return
+		} else if err == custom_errors.DuplicateKey {
+			responseDTO.UserErrs = []error{errors.New("user is already subscribed to the space")}
+			responseDTO.ResponseCode = "already_subscribed"
+			responseDTO.Status = 400
+			return
+		}
+		responseDTO.ServerErr = err
+		return
+	}
+
+	responseDTO.Msg = "Done"
+	return
+}
+
+func (s spaceService) Unsubscribe(spaceId uint64, user models.User) (responseDTO dtos.ResponseDTO) {
+
+	if err := s.repo.UnsubscribeSub(user.ID, spaceId); err != nil {
+		if err == custom_errors.RecordNotFound {
+			responseDTO.UserErrs = []error{errors.New("user is not subscribed to the space")}
+			responseDTO.ResponseCode = "not_subscribed"
+			responseDTO.Status = 400
+			return
+		}
+		responseDTO.ServerErr = err
+		return
+	}
+
+	responseDTO.Msg = "Done"
 	return
 }

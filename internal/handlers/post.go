@@ -49,7 +49,7 @@ func NewPostHandler(service services.PostService, response response.JsonResponse
 // @Success 200 {object} response.SuccessResponse{data=dtos.PostOutput} "successfully created"
 // @Failure 400 {object} response.ErrorResponse "falied"
 // @Failure 500 {object} response.ErrorResponse "Internal server error"
-// @Router /subs/:subId/posts [post]
+// @Router /spaces/:spaceId/posts [post]
 func (h *postHandler) Create(c *gin.Context) {
 	var postInput dtos.PostInput
 
@@ -65,14 +65,14 @@ func (h *postHandler) Create(c *gin.Context) {
 	}
 
 	// get subId from url
-	subIdString, ok := c.Params.Get("subId")
+	subIdString, ok := c.Params.Get("spaceId")
 	if !ok {
-		h.response.ErrorResponse(c, http.StatusBadRequest, "sub_id_not_found_in_url", "", errors.New("sub_id: sub id not found in url params"))
+		h.response.ErrorResponse(c, http.StatusBadRequest, "space_id_not_found_in_url", "", errors.New("space_id: sub id not found in url params"))
 		return
 	}
 	subId, err := strconv.Atoi(subIdString)
 	if err != nil {
-		h.response.ErrorResponse(c, http.StatusBadRequest, "invalid_sub_id", "", errors.New("sub_id: invalid post id"))
+		h.response.ErrorResponse(c, http.StatusBadRequest, "invalid_space_id", "", errors.New("space_id: invalid post id"))
 		return
 	}
 

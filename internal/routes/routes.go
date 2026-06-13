@@ -26,9 +26,11 @@ func SetupRoutes(r *gin.Engine, authMiddleware middleware.AuthMiddleware, userHa
 	authV1.DELETE("/spaces/:spaceId", subHandler.Delete)
 	v1.GET("/spaces", subHandler.GetAll)
 	v1.GET("/spaces/:spaceId", subHandler.GetByID)
+	authV1.POST("/spaces/:spaceId/subscribe", subHandler.Subscribe)
+	authV1.POST("/spaces/:spaceId/unsubscribe", subHandler.Unsubscribe)
 
 	// posts
-	authV1.POST("/spaces/:subId/post", postHandler.Create)
+	authV1.POST("/spaces/:spaceId/posts", postHandler.Create)
 	authV1.PUT("/posts/:postId", postHandler.Update)
 	authV1.DELETE("/posts/:postId", postHandler.Delete)
 	v1.GET("/posts", postHandler.GetAll)

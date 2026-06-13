@@ -6,5 +6,5 @@ import (
 
 var (
 	RecordNotFound error = gorm.ErrRecordNotFound
-	DuplicateKey error = gorm.ErrDuplicatedKey
+	DuplicateKey   error = gorm.ErrDuplicatedKey
 )

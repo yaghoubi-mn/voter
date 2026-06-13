@@ -120,6 +120,7 @@ func migrate(db *gorm.DB) {
 		models.PostVote{},
 		models.Comment{},
 		models.CommentVote{},
+		models.Subscription{},
 	)
 }
 

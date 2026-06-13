@@ -20,9 +20,8 @@ type Space struct {
 }
 
 type Subscription struct {
-	ID      uint64 `gorm:"primaryKey;pk:user_id,sub_id"`
 	User    User   `gorm:"constraint:OnDelete:CASCADE;"`
-	UserID  uint64
-	Space   Space `gorm:"constraint:OnDelete:CASCADE;"`
-	SpaceID uint64
+	UserID  uint64 `gorm:"primaryKey"`
+	Space   Space  `gorm:"constraint:OnDelete:CASCADE;"`
+	SpaceID uint64 `gorm:"primaryKey"`
 }
