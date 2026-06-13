@@ -7,9 +7,10 @@ type Post struct {
 	Title   string `gorm:"size:200;not null"`
 	Content string `gorm:"size:1000;not null"`
 
-	Score      int       `gorm:"default:0"`
-	CreatedAt  time.Time `gorm:"autoCreateTime"`
-	ModifiedAt time.Time `gorm:"autoUpdateTime:false"`
+	Score         int       `gorm:"default:0"`
+	CommentsCount int       `gorm:"default:0"`
+	CreatedAt     time.Time `gorm:"autoCreateTime"`
+	ModifiedAt    time.Time `gorm:"autoUpdateTime:false"`
 
 	AuthorID uint64
 	Author   User `gorm:"constraint:OnDelete:CASCADE;"`

@@ -24,6 +24,7 @@ type PostHandler interface {
 	UpVote(c *gin.Context)
 	DownVote(c *gin.Context)
 	DeleteVote(c *gin.Context)
+	GetUserHomePosts(c *gin.Context)
 }
 
 type postHandler struct {
@@ -442,4 +443,68 @@ func (h *postHandler) DeleteVote(c *gin.Context) {
 
 	h.response.Response(c, http.StatusOK, responseDTO.ResponseCode, responseDTO.Msg, responseDTO.Data, nil)
 
+}
+
+// GetUserHomePosts godoc
+// @Description Get user home posts. can be sort by "trending", "score", "date".
+// @Tags posts
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "authorization token (value: Bearer <jwt-token>)"
+// @Param page query integer true "page number"
+// @Param sort_by query string true "\"date\" or \"score\" or \"trending\""
+// @Success 200 {object} response.SuccessResponse{data=[]dtos.PostOutput} "Successfully fetched"
+// @Failure 400 {object} response.ErrorResponse "falied"
+// @Failure 403 {object} response.ErrorResponse "Access Denied"
+// @Failure 500 {object} response.ErrorResponse "Internal server error"
+// @Router /posts/home [get]
+func (h *postHandler) GetUserHomePosts(c *gin.Context) {
+
+	user, ok := c.Get("user")
+	if !ok {
+		h.response.ServerErrorResponse(c, errors.New("user not found in context"))
+		return
+	}
+
+	// get query params from url
+	pageString := c.Query("page")
+	if pageString == "" {
+		h.response.ErrorResponse(c, http.StatusBadRequest, "page_not_found_in_url", "", errors.New("page: page is required. ex: /?page=1"))
+		return
+	}
+	page, err := strconv.Atoi(pageString)
+	if err != nil {
+		h.response.ErrorResponse(c, http.StatusBadRequest, "invalid_page", "", errors.New("page: invalid page. page must be integer"))
+		return
+	}
+
+	sortByString, ok := c.GetQuery("sort_by")
+
+	var sortBy enums.SortBy
+	if !ok {
+		sortBy = enums.DefaultSort
+	}
+
+	switch sortByString {
+	case "score":
+		sortBy = enums.SortByScore
+	case "date":
+		sortBy = enums.SortByDate
+	case "trending":
+		sortBy = enums.Trending
+	case "":
+		sortBy = enums.SortByDate
+	default:
+		h.response.ErrorResponse(c, 400, "invalid_param", "", errors.New("sort_by: invalid sort_by value"))
+		return
+	}
+
+	// call service
+	responseDTO := h.service.GetUserHomePosts(sortBy, page, user.(models.User))
+	if responseDTO.ServerErr != nil || responseDTO.UserErrs != nil {
+		h.response.ServerOrUserErrorResponse(c, responseDTO.Status, responseDTO.Msg, responseDTO.ServerErr, responseDTO.UserErrs, responseDTO.ResponseCode)
+		return
+	}
+
+	h.response.Response(c, http.StatusOK, responseDTO.ResponseCode, responseDTO.Msg, responseDTO.Data, nil)
 }

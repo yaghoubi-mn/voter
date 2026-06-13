@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/yaghoubi-mn/voter/internal/config"
 	"github.com/yaghoubi-mn/voter/internal/custom_errors"
@@ -17,6 +18,7 @@ type PostRepository interface {
 	GetByID(postId uint64) (models.Post, error)
 	GetAll(sortBy enums.SortBy, page int) ([]models.Post, error)
 	GetBySpace(sortBy enums.SortBy, page int, spaceId uint64) ([]models.Post, error)
+	GetUserHomePosts(sortBy enums.SortBy, page int, userID uint64) ([]models.Post, error)
 
 	AddPostScore(postId uint64, number int) error
 }
@@ -95,4 +97,18 @@ func (r *postRepository) AddPostScore(postId uint64, number int) error {
 	}
 
 	return nil
+}
+
+func (r *postRepository) GetUserHomePosts(sortBy enums.SortBy, page int, userID uint64) ([]models.Post, error) {
+	var posts []models.Post
+	var err error
+	var order any = string(sortBy)
+	if sortBy == enums.Trending {
+		order = gorm.Expr("(posts.score + posts.comments_count) / POWER(TIMESTAMPDIFF(HOUR, created_at, NOW())+ 2, %f) DESC", config.PostTrendingGravity)
+	}
+	err = r.db.Preload("Author").Preload("Space").Where("posts.created_at > ?", time.Now().AddDate(0, 0, -7)).
+		Joins("JOIN subscriptions ON subscriptions.space_id = posts.space_id AND subscriptions.user_id = ?", userID).
+		Order(order).Offset((page - 1) * config.PageLimit).Limit(config.PageLimit).Find(&posts).Error
+
+	return posts, err
 }

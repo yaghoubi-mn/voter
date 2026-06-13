@@ -40,6 +40,7 @@ func SetupRoutes(r *gin.Engine, authMiddleware middleware.AuthMiddleware, userHa
 	authV1.POST("/posts/:postId/upvote", postHandler.UpVote)
 	authV1.POST("/posts/:postId/downvote", postHandler.DownVote)
 	authV1.DELETE("/posts/:postId/votes", postHandler.DeleteVote)
+	authV1.GET("/posts/home", postHandler.GetUserHomePosts)
 
 	// comments
 	authV1.POST("posts/:postId/comments", commentHandler.Create)

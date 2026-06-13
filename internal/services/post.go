@@ -24,6 +24,7 @@ type PostService interface {
 	GetByID(postId uint64) dtos.ResponseDTO
 	Vote(postId uint64, vote bool, user models.User) dtos.ResponseDTO
 	DeleteVote(postId uint64, user models.User) dtos.ResponseDTO
+	GetUserHomePosts(sortBy enums.SortBy, page int, user models.User) dtos.ResponseDTO
 }
 
 type postService struct {
@@ -342,5 +343,25 @@ func (s *postService) DeleteVote(postId uint64, user models.User) (responseDTO d
 	}
 
 	responseDTO.Msg = "Done"
+	return
+}
+
+func (s *postService) GetUserHomePosts(sortBy enums.SortBy, page int, user models.User) (responseDTO dtos.ResponseDTO) {
+
+	var posts []models.Post
+
+	// get data from database
+	posts, err := s.repo.GetUserHomePosts(sortBy, page, user.ID)
+	if err != nil {
+		responseDTO.ServerErr = err
+		return
+	}
+
+	postsOutput := make([]dtos.PostOutput, len(posts))
+	for i, post := range posts {
+		postsOutput[i] = dtos.GetPostOutputFromPost(post)
+	}
+
+	responseDTO.Data = postsOutput
 	return
 }

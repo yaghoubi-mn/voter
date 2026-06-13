@@ -13,6 +13,7 @@ import (
 const (
 	JWTRefreshExpireTime = 7 * 24 * time.Hour
 	JWTAccessExpireTime  = 1000 * time.Minute // reduce this in production
+	PostTrendingGravity  = 1.8
 
 	PageLimit = 20
 

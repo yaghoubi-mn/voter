@@ -575,6 +575,55 @@ paths:
             $ref: '#/definitions/response.ErrorResponse'
       tags:
       - posts
+  /posts/home:
+    get:
+      consumes:
+      - application/json
+      description: Get user home posts. can be sort by "trending", "score", "date".
+      parameters:
+      - description: 'authorization token (value: Bearer <jwt-token>)'
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: page number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - description: \
+        in: query
+        name: sort_by
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully fetched
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.SuccessResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dtos.PostOutput'
+                  type: array
+              type: object
+        "400":
+          description: falied
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "403":
+          description: Access Denied
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      tags:
+      - posts
   /spaces:
     get:
       consumes:
@@ -812,7 +861,6 @@ paths:
             $ref: '#/definitions/response.ErrorResponse'
       tags:
       - posts
-  /subs/:subId/posts:
     post:
       consumes:
       - application/json
@@ -857,6 +905,79 @@ paths:
             $ref: '#/definitions/response.ErrorResponse'
       tags:
       - posts
+  /spaces/:spaceId/subscribe:
+    post:
+      consumes:
+      - application/json
+      description: Subscribe a space
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: successfully done
+          schema:
+            $ref: '#/definitions/response.SuccessResponse'
+        "400":
+          description: falied
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      tags:
+      - spaces
+  /spaces/:spaceId/unsubscribe:
+    post:
+      consumes:
+      - application/json
+      description: Unsubscribe a space
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: successfully done
+          schema:
+            $ref: '#/definitions/response.SuccessResponse'
+        "400":
+          description: falied
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      tags:
+      - spaces
+  /spaces/subscriptions:
+    get:
+      consumes:
+      - application/json
+      description: Get list of authenticated user subscriptions
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: successfully done
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.SuccessResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dtos.SpaceOutput'
+                  type: array
+              type: object
+        "400":
+          description: falied
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      tags:
+      - spaces
   /users/login:
     post:
       consumes:
