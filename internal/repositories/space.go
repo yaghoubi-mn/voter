@@ -21,6 +21,7 @@ type SpaceRepository interface {
 	SubscribeSub(userID, spaceID uint64) error
 	UnsubscribeSub(userID, spaceID uint64) error
 	GetUserSubscriptions(userID uint64) ([]models.Space, error)
+	IncreaseSpaceSubscribersCount(spaceId uint64, count int) error
 }
 
 type spaceRepository struct {
@@ -118,4 +119,8 @@ func (r *spaceRepository) GetUserSubscriptions(userID uint64) ([]models.Space, e
 	}
 
 	return spaces, nil
+}
+
+func (r spaceRepository) IncreaseSpaceSubscribersCount(spaceId uint64, count int) error {
+	return r.db.Model(&models.Space{}).Where("id=?", spaceId).Update("subscribers_count", gorm.Expr("subscribers_count + ?", count)).Error
 }

@@ -226,6 +226,11 @@ func (s spaceService) Subscribe(spaceId uint64, user models.User) (responseDTO d
 		return
 	}
 
+	if err := s.repo.IncreaseSpaceSubscribersCount(spaceId, 1); err != nil {
+		responseDTO.ServerErr = err
+		return
+	}
+
 	responseDTO.Msg = "Done"
 	return
 }
@@ -239,6 +244,11 @@ func (s spaceService) Unsubscribe(spaceId uint64, user models.User) (responseDTO
 			responseDTO.Status = 400
 			return
 		}
+		responseDTO.ServerErr = err
+		return
+	}
+
+	if err := s.repo.IncreaseSpaceSubscribersCount(spaceId, -1); err != nil {
 		responseDTO.ServerErr = err
 		return
 	}
