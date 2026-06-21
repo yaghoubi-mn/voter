@@ -17,6 +17,7 @@ import (
 	"github.com/yaghoubi-mn/voter/internal/cache"
 	"github.com/yaghoubi-mn/voter/internal/config"
 	"github.com/yaghoubi-mn/voter/internal/database"
+	"github.com/yaghoubi-mn/voter/internal/dtos"
 	"github.com/yaghoubi-mn/voter/internal/enums"
 	"github.com/yaghoubi-mn/voter/internal/handlers"
 	"github.com/yaghoubi-mn/voter/internal/middleware"
@@ -110,6 +111,11 @@ func main() {
 
 	routes.SetupRoutes(r, authMiddleware, userHandler, subHandler, postHandler, commentHandler)
 
+	if len(os.Args) > 1 && os.Args[1] == "test-data" {
+		addTestData(userRepository, userService, subService, postService, commentService)
+		return
+	}
+
 	r.Run()
 }
 
@@ -175,4 +181,37 @@ func setupValidator() *validator.Validate {
 	validate := validator.New()
 	validate.RegisterValidation("username", utils.ValidateUsername)
 	return validate
+}
+
+func addTestData(userRepository repositories.UserRepository, userService services.UserService, spaceService services.SpaceService, postService services.PostService, commentService services.CommentService) {
+	// create two users
+	userService.Register(dtos.RegisterInput{Username: "user1", Password: "12345678"})
+	userService.Register(dtos.RegisterInput{Username: "user2", Password: "12345678"})
+
+	// get users
+	user1, _ := userRepository.GetByUsername("user1")
+	user2, _ := userRepository.GetByUsername("user2")
+
+	// create some spaces
+	space1 := spaceService.Create(dtos.SpaceCreateInput{Title: "First space", Username: "first_space", Description: "This is a discription"}, user1).Data.(dtos.SpaceOutput)
+	space2 := spaceService.Create(dtos.SpaceCreateInput{Title: "Docker", Username: "docker", Description: "This is a test description"}, user2).Data.(dtos.SpaceOutput)
+
+	// subscribe to spaces
+	spaceService.Subscribe(space2.ID, user1)
+
+	// create some posts
+	post1 := postService.Create(dtos.PostInput{Title: "My First Post", Content: "This a the first post in the community"}, space1.ID, user1).Data.(dtos.PostOutput)
+	post2 := postService.Create(dtos.PostInput{Title: "What is Docker", Content: "You knew it."}, space2.ID, user1).Data.(dtos.PostOutput)
+	postService.Create(dtos.PostInput{Title: "Docker in Production", Content: "I'm not ganna expalin that :)"}, space2.ID, user2)
+
+	// create some comments
+	comment1 := commentService.Create(dtos.CommentInput{Content: "So this is the first comment"}, post1.ID, user2).Data.(dtos.CommentOutput)
+	commentService.Create(dtos.CommentInput{Content: "You are right!", ParentID: comment1.ID}, post1.ID, user1)
+	comment3 := commentService.Create(dtos.CommentInput{Content: "Are you kidding me?"}, post2.ID, user2).Data.(dtos.CommentOutput)
+
+	// vote
+	postService.Vote(post1.ID, true, user2)
+	commentService.Vote(comment1.ID, true, user2)
+	commentService.Vote(comment3.ID, false, user1)
+
 }

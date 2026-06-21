@@ -12,6 +12,10 @@ Change directory:
 ```
 cd voteria-backend
 ```
+Add test data:
+```
+go run . test-data
+```
 Run the server:
 ```
 go run .
