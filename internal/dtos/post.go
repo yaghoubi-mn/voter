@@ -21,6 +21,8 @@ type PostOutput struct {
 	Score          int    `json:"score"`
 	CreatedAt      string `json:"created_at"`
 	ModifiedAt     string `json:"modified_at"`
+	CommentsCount  int    `json:"comments_count"`
+	Views          uint64 `json:"views"`
 }
 
 func GetPostOutputFromPost(post models.Post) PostOutput {
@@ -35,5 +37,7 @@ func GetPostOutputFromPost(post models.Post) PostOutput {
 		Score:          post.Score,
 		CreatedAt:      post.CreatedAt.Format(config.TimeFormat),
 		ModifiedAt:     post.ModifiedAt.Format(config.TimeFormat),
+		CommentsCount:  post.CommentsCount,
+		Views:          post.Views,
 	}
 }

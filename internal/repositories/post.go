@@ -57,7 +57,7 @@ func (r *postRepository) Delete(postId uint64) error {
 
 func (r *postRepository) GetByID(postId uint64) (models.Post, error) {
 	var post models.Post
-	if err := r.db.Preload("Author").First(&post, &models.Post{ID: postId}).Error; err != nil {
+	if err := r.db.Preload("Author").Preload("Space").First(&post, &models.Post{ID: postId}).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return post, custom_errors.RecordNotFound
 		}
