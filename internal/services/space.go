@@ -72,6 +72,12 @@ func (s *spaceService) Create(spaceInput dtos.SpaceCreateInput, user models.User
 		return
 	}
 
+	// subscribe user to his/her own space
+	if err := s.repo.SubscribeSub(user.ID, space.ID); err != nil {
+		responseDTO.ServerErr = err
+		return
+	}
+
 	responseDTO.Msg = "space created"
 	spaceOutput := dtos.GetSubOutputFromSub(space)
 	responseDTO.Data = spaceOutput
